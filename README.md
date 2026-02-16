@@ -5,8 +5,6 @@ TypeScript SDK for the [DenScope Reputation API](https://denscope.vercel.app/doc
 ## Install
 
 ```bash
-npm install @denlabs/trust-sdk
-# or
 pnpm add @denlabs/trust-sdk
 ```
 
