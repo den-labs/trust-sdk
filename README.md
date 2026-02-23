@@ -58,6 +58,20 @@ const { signals } = await ds.getSignals(42220, 5) // $0.0005
 
 x402 is supported on `/score` and `/signals` endpoints. The SDK handles the full 402 flow automatically: receives payment requirement, signs EIP-712 authorization, and retries with the X-PAYMENT header.
 
+## Runnable Examples (local repo)
+
+After cloning this repository:
+
+```bash
+pnpm install
+pnpm example:get-score      # requires DENSCOPE_API_KEY=ds_...
+pnpm example:get-score:x402 # requires DENSCOPE_PRIVATE_KEY=0x...
+```
+
+Optional env vars for both examples:
+- `DENSCOPE_CHAIN_ID` (default: `42220`)
+- `DENSCOPE_AGENT_ID` (default: `5`)
+
 ## API Reference
 
 ### `new DenScope(config)`

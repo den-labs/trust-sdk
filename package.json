@@ -26,7 +26,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "prepublishOnly": "pnpm build"
+    "prepublishOnly": "pnpm build",
+    "example:get-score": "pnpm build && node examples/get-score.mjs",
+    "example:get-score:x402": "pnpm build && node examples/get-score-x402.mjs"
   },
   "keywords": [
     "erc-8004",
