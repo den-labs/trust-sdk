@@ -72,6 +72,39 @@ Optional env vars for both examples:
 - `DENSCOPE_CHAIN_ID` (default: `42220`)
 - `DENSCOPE_AGENT_ID` (default: `5`)
 
+## DX Checklist (Production Readiness)
+
+Use this checklist to make the SDK easier to adopt and safer to integrate in real apps.
+
+### High priority (next sprint)
+
+- Add request timeout / AbortSignal support
+- Allow custom/injected `fetch` (runtime compatibility + testing)
+- Add a short “common errors and recovery” section (401/402/429/404)
+- Publish a tagged release + changelog
+
+### Medium priority
+
+- Add conservative retry/backoff for `429` / `5xx` responses
+- Improve x402 payment method selection (not only first accepted method)
+- Add more runnable examples (search -> agent -> score workflow)
+- Document compatibility matrix (Node versions / viem versions)
+
+### Nice to have
+
+- Runtime response validation/guards for public SDK hardening
+- Helper utilities (or docs) for mapping score/confidence to semantic trust states
+- CI badges / npm version badge / release notes links
+
+### DX success criteria
+
+A new developer should be able to:
+
+1. Install the SDK
+2. Run an example successfully
+3. Understand a common error and recover
+4. Integrate `getScore`/`getSignals` in under 30 minutes
+
 ## API Reference
 
 ### `new DenScope(config)`
