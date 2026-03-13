@@ -1,6 +1,19 @@
 # @denlabs/trust-sdk
 
-TypeScript SDK for the [DenScope Reputation API](https://denscope.vercel.app/docs/api) — query ERC-8004 agent trust scores with API key or x402 micropayments.
+<!-- denlabs-meta
+name: trust-sdk
+type: package
+surface: public-sdk
+status: public
+owner: Wolfcito
+pm: pnpm
+repo: https://github.com/den-labs/trust-sdk
+url: https://github.com/den-labs/trust-sdk
+scripts: [build, test, typecheck]
+-->
+
+> **DenLabs Lab** · SDK · Celo
+> TypeScript SDK for the DenScope Reputation API — query ERC-8004 agent trust scores with API key or x402 micropayments.
 
 ## Install
 
