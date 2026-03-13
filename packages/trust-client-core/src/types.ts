@@ -1,11 +1,22 @@
-/** Configuration for API key authentication */
-export interface ApiKeyConfig {
-  apiKey: string
+export type TrustClientFetch = typeof globalThis.fetch
+
+export interface BaseClientConfig {
   baseUrl?: string
+  /** Override fetch implementation (testing/custom runtimes) */
+  fetch?: TrustClientFetch
+  /** Abort all requests when this signal aborts */
+  signal?: AbortSignal
+  /** Per-request timeout in milliseconds */
+  timeoutMs?: number
+}
+
+/** Configuration for API key authentication */
+export interface ApiKeyConfig extends BaseClientConfig {
+  apiKey: string
 }
 
 /** Configuration for x402 micropayment authentication (requires viem) */
-export interface X402Config {
+export interface X402Config extends BaseClientConfig {
   account: {
     address: `0x${string}`
     signTypedData: (args: {
@@ -15,10 +26,9 @@ export interface X402Config {
       message: Record<string, unknown>
     }) => Promise<`0x${string}`>
   }
-  baseUrl?: string
 }
 
-export type DenScopeConfig = ApiKeyConfig | X402Config
+export type TrustClientConfig = ApiKeyConfig | X402Config
 
 // --- API Response Types ---
 

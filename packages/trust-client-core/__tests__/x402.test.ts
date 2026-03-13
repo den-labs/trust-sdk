@@ -13,7 +13,7 @@ const MOCK_REQUIREMENT = {
 }
 
 const MOCK_RESOURCE = {
-  url: 'https://denscope.vercel.app/api/v1/agent/42220/5/score',
+  url: 'https://example.com/api/v1/agent/42220/5/score',
   description: 'Trust score query for ERC-8004 agent',
   mimeType: 'application/json',
 }

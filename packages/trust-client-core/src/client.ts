@@ -1,14 +1,15 @@
-import { API_PREFIX, DEFAULT_BASE_URL } from './constants'
+import { API_PREFIX } from './constants'
 import {
   AuthenticationError,
-  DenScopeError,
+  TrustClientError,
   PaymentRequiredError,
 } from './errors'
 import { buildPaymentHeader, decodePaymentRequired } from './x402'
 import type {
   AgentProfileResponse,
   ApiKeyConfig,
-  DenScopeConfig,
+  TrustClientConfig,
+  TrustClientFetch,
   EventsOptions,
   EventsResponse,
   ScoreResponse,
@@ -19,21 +20,27 @@ import type {
   X402Config,
 } from './types'
 
-function isApiKeyConfig(config: DenScopeConfig): config is ApiKeyConfig {
+function isApiKeyConfig(config: TrustClientConfig): config is ApiKeyConfig {
   return 'apiKey' in config
 }
 
-function isX402Config(config: DenScopeConfig): config is X402Config {
+function isX402Config(config: TrustClientConfig): config is X402Config {
   return 'account' in config
 }
 
-export class DenScope {
+export class TrustClient {
   private readonly baseUrl: string
-  private readonly config: DenScopeConfig
+  private readonly config: TrustClientConfig
+  private readonly fetchImpl: TrustClientFetch
 
-  constructor(config: DenScopeConfig) {
+  constructor(config: TrustClientConfig, defaultBaseUrl: string) {
     this.config = config
-    this.baseUrl = (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/$/, '')
+    this.baseUrl = (config.baseUrl ?? defaultBaseUrl).replace(/\/$/, '')
+    this.fetchImpl = config.fetch ?? globalThis.fetch
+
+    if (!this.fetchImpl) {
+      throw new Error('Fetch API is not available. Provide config.fetch in this runtime.')
+    }
   }
 
   /** Get agent profile */
@@ -87,10 +94,10 @@ export class DenScope {
     const headers: Record<string, string> = {}
 
     if (isApiKeyConfig(this.config)) {
-      headers['Authorization'] = `Bearer ${this.config.apiKey}`
+      headers.Authorization = `Bearer ${this.config.apiKey}`
     }
 
-    const response = await fetch(url, { headers })
+    const response = await this.fetchWithConfig(url, { headers })
 
     // x402 retry: on 402 with an x402 account, sign and retry once
     if (response.status === 402 && isX402Config(this.config)) {
@@ -106,7 +113,7 @@ export class DenScope {
         paymentRequired.resource,
       )
 
-      const retryResponse = await fetch(url, {
+      const retryResponse = await this.fetchWithConfig(url, {
         headers: { 'X-PAYMENT': paymentHeader },
       })
 
@@ -114,6 +121,59 @@ export class DenScope {
     }
 
     return this.handleResponse<T>(response)
+  }
+
+  private async fetchWithConfig(
+    url: string,
+    init: { headers: Record<string, string> },
+  ): Promise<Response> {
+    const { signal, cleanup } = this.createRequestSignal()
+    try {
+      const requestInit: RequestInit = { headers: init.headers }
+      if (signal) requestInit.signal = signal
+      return await this.fetchImpl(url, requestInit)
+    } finally {
+      cleanup()
+    }
+  }
+
+  private createRequestSignal(): {
+    signal?: AbortSignal
+    cleanup: () => void
+  } {
+    const timeoutMs = this.config.timeoutMs
+    const baseSignal = this.config.signal
+
+    if (timeoutMs == null) {
+      return { signal: baseSignal, cleanup: () => {} }
+    }
+
+    const controller = new AbortController()
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+
+    const abortFromBase = () => {
+      controller.abort(baseSignal?.reason ?? new Error('Request aborted'))
+    }
+
+    if (baseSignal) {
+      if (baseSignal.aborted) {
+        abortFromBase()
+      } else {
+        baseSignal.addEventListener('abort', abortFromBase, { once: true })
+      }
+    }
+
+    timeoutId = setTimeout(() => {
+      controller.abort(new Error(`Request timed out after ${timeoutMs}ms`))
+    }, timeoutMs)
+
+    return {
+      signal: controller.signal,
+      cleanup: () => {
+        if (timeoutId) clearTimeout(timeoutId)
+        if (baseSignal) baseSignal.removeEventListener('abort', abortFromBase)
+      },
+    }
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
@@ -140,7 +200,7 @@ export class DenScope {
       throw new PaymentRequiredError('Payment required', body)
     }
 
-    throw new DenScopeError(
+    throw new TrustClientError(
       `API error: ${response.status}`,
       response.status,
       body,

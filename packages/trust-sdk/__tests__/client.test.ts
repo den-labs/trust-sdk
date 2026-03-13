@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { DenScope, DenScopeError, AuthenticationError, PaymentRequiredError } from '../src'
 
 const BASE = 'https://denscope.vercel.app'
@@ -207,10 +207,8 @@ describe('DenScope client (x402 mode)', () => {
 
     expect(result.score.value).toBe(80)
     expect(globalThis.fetch).toHaveBeenCalledTimes(2)
-    // Second call should have X-PAYMENT header
     const secondCall = (globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[1]
     expect(secondCall[1].headers['X-PAYMENT']).toBeDefined()
-    // signTypedData should have been called with EIP-712 params
     expect(mockAccount.signTypedData).toHaveBeenCalledOnce()
     const signArgs = mockAccount.signTypedData.mock.calls[0][0]
     expect(signArgs.domain.name).toBe('USD Coin')
