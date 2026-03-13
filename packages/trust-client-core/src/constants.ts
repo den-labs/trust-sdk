@@ -1,5 +1,3 @@
-export const DEFAULT_BASE_URL = 'https://denscope.vercel.app'
-
 export const API_PREFIX = '/api/v1'
 
 /** EIP-3009 TransferWithAuthorization types for EIP-712 signing */
