@@ -1,8 +1,8 @@
-# @denlabs/trust-sdk
+# DenLabs Trust SDK
 
 <!-- denlabs-meta
 name: trust-sdk
-type: package
+type: monorepo
 surface: public-sdk
 status: public
 owner: Wolfcito
@@ -12,16 +12,17 @@ url: https://github.com/den-labs/trust-sdk
 scripts: [build, test, typecheck]
 -->
 
-> **DenLabs Lab** · SDK · Celo
-> TypeScript SDK for the DenScope Reputation API — query ERC-8004 agent trust scores with API key or x402 micropayments.
+> **DenLabs Lab** · Multichain SDK
+> TypeScript SDKs for querying ERC-8004 agent trust scores — API key or x402 micropayments.
 
-## Install
+## Packages
 
-```bash
-pnpm add @denlabs/trust-sdk
-```
+| Package | Chain | npm | Install |
+|---------|-------|-----|---------|
+| `@denlabs/trust-sdk` | Celo | [![npm](https://img.shields.io/npm/v/@denlabs/trust-sdk)](https://www.npmjs.com/package/@denlabs/trust-sdk) | `pnpm add @denlabs/trust-sdk` |
+| `@denlabs/ayni-sdk` | Avalanche | [![npm](https://img.shields.io/npm/v/@denlabs/ayni-sdk)](https://www.npmjs.com/package/@denlabs/ayni-sdk) | `pnpm add @denlabs/ayni-sdk` |
 
-For x402 payment mode, also install viem:
+Both SDKs share `@denlabs/trust-client-core` (base client, x402, errors, types). For x402 payment mode, also install `viem`:
 
 ```bash
 pnpm add viem
@@ -29,28 +30,24 @@ pnpm add viem
 
 ## Quick Start
 
-### API Key Mode
+### DenScope (Celo)
 
 ```typescript
 import { DenScope } from '@denlabs/trust-sdk'
 
 const ds = new DenScope({ apiKey: 'ds_...' })
-
-// Get agent trust score
 const { score } = await ds.getScore(42220, 5)
 console.log(score.value, score.confidence) // 72 "high"
+```
 
-// Get agent profile
-const { agent } = await ds.getAgent(42220, 5)
+### Ayni (Avalanche)
 
-// Get signals/incidents
-const { signals } = await ds.getSignals(42220, 5, { status: 'open' })
+```typescript
+import { Ayni } from '@denlabs/ayni-sdk'
 
-// Get events
-const { events } = await ds.getEvents(42220, 5, { limit: 10 })
-
-// Search agents
-const { agents } = await ds.search({ q: '0xabc', chainId: 42220 })
+const ayni = new Ayni({ apiKey: 'ds_...' })
+const { score } = await ayni.getScore(43114, 1)
+console.log(score.value, score.confidence)
 ```
 
 ### x402 Payment Mode
@@ -64,105 +61,65 @@ import { privateKeyToAccount } from 'viem/accounts'
 const account = privateKeyToAccount('0x...')
 const ds = new DenScope({ account })
 
-// Automatically handles 402 → sign → retry
+// Automatically handles 402 -> sign -> retry
 const { score } = await ds.getScore(42220, 5)   // $0.001
 const { signals } = await ds.getSignals(42220, 5) // $0.0005
 ```
 
 x402 is supported on `/score` and `/signals` endpoints. The SDK handles the full 402 flow automatically: receives payment requirement, signs EIP-712 authorization, and retries with the X-PAYMENT header.
 
-## Runnable Examples (local repo)
+## Supported Chains
 
-After cloning this repository:
-
-```bash
-pnpm install
-pnpm example:get-score      # requires DENSCOPE_API_KEY=ds_...
-pnpm example:get-score:x402 # requires DENSCOPE_PRIVATE_KEY=0x...
-```
-
-Optional env vars for both examples:
-- `DENSCOPE_CHAIN_ID` (default: `42220`)
-- `DENSCOPE_AGENT_ID` (default: `5`)
-
-## DX Checklist (Production Readiness)
-
-Use this checklist to make the SDK easier to adopt and safer to integrate in real apps.
-
-### High priority (next sprint)
-
-- Add request timeout / AbortSignal support
-- Allow custom/injected `fetch` (runtime compatibility + testing)
-- Add a short “common errors and recovery” section (401/402/429/404)
-- Publish a tagged release + changelog
-
-### Medium priority
-
-- Add conservative retry/backoff for `429` / `5xx` responses
-- Improve x402 payment method selection (not only first accepted method)
-- Add more runnable examples (search -> agent -> score workflow)
-- Document compatibility matrix (Node versions / viem versions)
-
-### Nice to have
-
-- Runtime response validation/guards for public SDK hardening
-- Helper utilities (or docs) for mapping score/confidence to semantic trust states
-- CI badges / npm version badge / release notes links
-
-### DX success criteria
-
-A new developer should be able to:
-
-1. Install the SDK
-2. Run an example successfully
-3. Understand a common error and recover
-4. Integrate `getScore`/`getSignals` in under 30 minutes
+| SDK | Chain | Chain ID | Oracle URL |
+|-----|-------|----------|------------|
+| `@denlabs/trust-sdk` | Celo Mainnet | 42220 | denscope.vercel.app |
+| `@denlabs/trust-sdk` | Celo Sepolia | 11142220 | denscope.vercel.app |
+| `@denlabs/ayni-sdk` | Avalanche C-Chain | 43114 | ayni-alpha.vercel.app |
+| `@denlabs/ayni-sdk` | Avalanche Fuji | 43113 | ayni-alpha.vercel.app |
 
 ## API Reference
 
-### `new DenScope(config)`
+Both SDKs expose the same 5 methods:
+
+### Constructor
+
+```typescript
+// DenScope (Celo)
+const client = new DenScope({ apiKey: 'ds_...' })
+const client = new DenScope({ account, baseUrl: '...' })
+
+// Ayni (Avalanche)
+const client = new Ayni({ apiKey: 'ds_...' })
+const client = new Ayni({ account, baseUrl: '...' })
+```
 
 | Config | Required | Description |
 |--------|----------|-------------|
-| `apiKey` | One of | DenScope API key (`ds_...` prefix) |
+| `apiKey` | One of | API key (`ds_...` prefix) |
 | `account` | One of | viem account with `signTypedData` (for x402) |
-| `baseUrl` | No | Override API URL (default: `https://denscope.vercel.app`) |
+| `baseUrl` | No | Override API URL |
+| `timeoutMs` | No | Request timeout in milliseconds |
+| `fetch` | No | Custom fetch implementation |
 
 ### Methods
 
-#### `getAgent(chainId, agentId): Promise<AgentProfileResponse>`
-
-Get agent profile including owner, metadata, feedback counts, and claim status.
-
-#### `getScore(chainId, agentId): Promise<ScoreResponse>`
-
-Get trust score (0-100) with confidence level, breakdown, and stats. Supports x402 payment.
-
-#### `getSignals(chainId, agentId, options?): Promise<SignalsResponse>`
-
-Get agent incidents/signals. Supports x402 payment.
-
-Options: `{ status?: 'open' | 'resolved' | 'all' }`
-
-#### `getEvents(chainId, agentId, options?): Promise<EventsResponse>`
-
-Get agent on-chain events with pagination.
-
-Options: `{ limit?: number, offset?: number, kind?: string }`
-
-#### `search(options?): Promise<SearchResponse>`
-
-Search agents by ID or owner address.
-
-Options: `{ q?: string, chainId?: number, limit?: number }`
+| Method | Description | x402 |
+|--------|-------------|------|
+| `getAgent(chainId, agentId)` | Agent profile, owner, metadata, feedback counts | No |
+| `getScore(chainId, agentId)` | Trust score (0-100) with confidence and breakdown | Yes |
+| `getSignals(chainId, agentId, opts?)` | Risk signals/incidents | Yes |
+| `getEvents(chainId, agentId, opts?)` | On-chain event history | No |
+| `search(opts?)` | Search agents by ID, owner, or chain | No |
 
 ### Error Types
 
 ```typescript
 import { DenScopeError, AuthenticationError, PaymentRequiredError } from '@denlabs/trust-sdk'
+// or
+import { AyniError, AuthenticationError, PaymentRequiredError } from '@denlabs/ayni-sdk'
 
 try {
-  await ds.getScore(42220, 5)
+  await client.getScore(42220, 5)
 } catch (e) {
   if (e instanceof AuthenticationError) {
     // 401 or 403 — invalid/disabled API key
@@ -175,12 +132,32 @@ try {
 }
 ```
 
-## Supported Chains
+## Runnable Examples
 
-| Chain | Chain ID |
-|-------|----------|
-| Celo Mainnet | 42220 |
-| Celo Sepolia | 11142220 |
+After cloning this repository:
+
+```bash
+pnpm install && pnpm build
+
+# DenScope (Celo)
+DENSCOPE_API_KEY=ds_... node packages/trust-sdk/examples/get-score.mjs
+DENSCOPE_API_KEY=ds_... node packages/trust-sdk/examples/test-all-endpoints.mjs
+
+# Ayni (Avalanche)
+AYNI_API_KEY=ds_... node packages/ayni-sdk/examples/get-score.mjs
+AYNI_API_KEY=ds_... node packages/ayni-sdk/examples/test-all-endpoints.mjs
+```
+
+## Monorepo Structure
+
+```
+packages/
+  trust-client-core/   @denlabs/trust-client-core — shared base client, x402, errors, types
+  trust-sdk/           @denlabs/trust-sdk — DenScope wrapper (Celo)
+  ayni-sdk/            @denlabs/ayni-sdk — Ayni wrapper (Avalanche)
+```
+
+Adding a new chain = new thin wrapper package (~20 lines of code).
 
 ## Requirements
 
