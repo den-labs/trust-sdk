@@ -1,6 +1,6 @@
 {
   "name": "@denlabs/ayni-sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript SDK for Ayni Trust Oracle API (Avalanche) — query trust scores with API key or x402 micropayments",
   "type": "module",
   "main": "./dist/index.cjs",

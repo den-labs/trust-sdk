@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
 import { Ayni, AyniError, AuthenticationError, PaymentRequiredError } from '../src'
 
-const BASE = 'https://ayni.vercel.app'
+const BASE = 'https://ayni-alpha.vercel.app'
 
 function mockFetch(status: number, body: unknown, headers?: Record<string, string>) {
   return vi.fn().mockResolvedValue({
