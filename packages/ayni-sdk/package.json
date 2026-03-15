@@ -27,6 +27,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepublishOnly": "pnpm build",
+    "test:e2e": "vitest run __tests__/e2e.test.ts",
     "example:get-score": "pnpm build && node examples/get-score.mjs",
     "example:get-score:x402": "pnpm build && node examples/get-score-x402.mjs"
   },

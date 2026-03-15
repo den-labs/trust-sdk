@@ -8,7 +8,8 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "test:coverage": "pnpm -r exec vitest run --coverage",
-    "test:watch": "pnpm -r test:watch"
+    "test:watch": "pnpm -r test:watch",
+    "test:e2e": "pnpm -r test:e2e"
   },
   "author": "DenLabs",
   "license": "MIT",
