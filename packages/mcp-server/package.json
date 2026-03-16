@@ -1,0 +1,40 @@
+{
+  "name": "@denlabs/trust-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for querying ERC-8004 agent trust scores via DenScope and Ayni",
+  "type": "module",
+  "bin": {
+    "trust-mcp-server": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build"
+  },
+  "keywords": [
+    "mcp",
+    "trust",
+    "erc-8004",
+    "agents",
+    "denscope",
+    "ayni"
+  ],
+  "author": "DenLabs",
+  "license": "MIT",
+  "dependencies": {
+    "@denlabs/trust-client-core": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
