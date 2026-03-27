@@ -1,7 +1,7 @@
 {
   "name": "@denlabs/trust-sdk",
-  "version": "0.2.0",
-  "description": "TypeScript SDK for DenScope Reputation API (Celo) — query trust scores with API key or x402 micropayments",
+  "version": "0.2.1",
+  "description": "TypeScript SDK for DenScope Reputation API — query trust scores with API key or x402 micropayments",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -38,7 +38,8 @@
     "agents",
     "x402",
     "denscope",
-    "celo"
+    "celo",
+    "skale"
   ],
   "author": "DenLabs",
   "license": "MIT",
