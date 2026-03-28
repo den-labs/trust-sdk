@@ -19,7 +19,7 @@ scripts: [build, test, typecheck]
 
 | Package | Chain | npm | Install |
 |---------|-------|-----|---------|
-| `@denlabs/trust-sdk` | Celo | [![npm](https://img.shields.io/npm/v/@denlabs/trust-sdk)](https://www.npmjs.com/package/@denlabs/trust-sdk) | `pnpm add @denlabs/trust-sdk` |
+| `@denlabs/trust-sdk` | Celo, SKALE Base | [![npm](https://img.shields.io/npm/v/@denlabs/trust-sdk)](https://www.npmjs.com/package/@denlabs/trust-sdk) | `pnpm add @denlabs/trust-sdk` |
 | `@denlabs/ayni-sdk` | Avalanche | [![npm](https://img.shields.io/npm/v/@denlabs/ayni-sdk)](https://www.npmjs.com/package/@denlabs/ayni-sdk) | `pnpm add @denlabs/ayni-sdk` |
 
 Both SDKs share `@denlabs/trust-client-core` (base client, x402, errors, types). For x402 payment mode, also install `viem`:
@@ -30,7 +30,7 @@ pnpm add viem
 
 ## Quick Start
 
-### DenScope (Celo)
+### DenScope (Celo, SKALE Base)
 
 ```typescript
 import { DenScope } from '@denlabs/trust-sdk'
@@ -74,6 +74,7 @@ x402 is supported on `/score` and `/signals` endpoints. The SDK handles the full
 |-----|-------|----------|------------|
 | `@denlabs/trust-sdk` | Celo Mainnet | 42220 | denscope.vercel.app |
 | `@denlabs/trust-sdk` | Celo Sepolia | 11142220 | denscope.vercel.app |
+| `@denlabs/trust-sdk` | SKALE Base | 1187947933 | denscope.vercel.app |
 | `@denlabs/ayni-sdk` | Avalanche C-Chain | 43114 | ayni-alpha.vercel.app |
 | `@denlabs/ayni-sdk` | Avalanche Fuji | 43113 | ayni-alpha.vercel.app |
 
@@ -153,7 +154,7 @@ AYNI_API_KEY=ds_... node packages/ayni-sdk/examples/test-all-endpoints.mjs
 ```
 packages/
   trust-client-core/   @denlabs/trust-client-core — shared base client, x402, errors, types
-  trust-sdk/           @denlabs/trust-sdk — DenScope wrapper (Celo)
+  trust-sdk/           @denlabs/trust-sdk — DenScope wrapper (Celo, SKALE Base)
   ayni-sdk/            @denlabs/ayni-sdk — Ayni wrapper (Avalanche)
 ```
 

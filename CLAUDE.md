@@ -9,7 +9,7 @@ Multichain trust oracle SDK monorepo. Shared core + per-chain thin wrappers for 
 ```
 packages/
 ├── trust-client-core/    @denlabs/trust-client-core — shared base client, x402, errors, types
-├── trust-sdk/            @denlabs/trust-sdk — DenScope wrapper (Celo: 42220, 11142220)
+├── trust-sdk/            @denlabs/trust-sdk — DenScope wrapper (Celo: 42220, 11142220; SKALE Base: 1187947933)
 └── ayni-sdk/             @denlabs/ayni-sdk — Ayni wrapper (Avalanche: 43114, 43113)
 ```
 

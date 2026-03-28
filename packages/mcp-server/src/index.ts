@@ -12,7 +12,7 @@ const ORACLES: Record<string, { name: string; baseUrl: string; chains: Record<st
   denscope: {
     name: 'DenScope',
     baseUrl: 'https://denscope.vercel.app',
-    chains: { celo: 42220, 'celo-sepolia': 11142220 },
+    chains: { celo: 42220, 'celo-sepolia': 11142220, 'skale-base': 1187947933 },
   },
   ayni: {
     name: 'Ayni',
@@ -79,8 +79,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       inputSchema: {
         type: 'object' as const,
         properties: {
-          oracle: { type: 'string', description: 'Trust oracle to query: "denscope" (Celo) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
-          chain: { type: 'string', description: 'Chain name or ID (e.g. "celo", "fuji", 42220, 43113)' },
+          oracle: { type: 'string', description: 'Trust oracle to query: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
+          chain: { type: 'string', description: 'Chain name or ID (e.g. "celo", "skale-base", "fuji", 42220, 1187947933)' },
           agentId: { type: 'number', description: 'Agent ID (numeric)' },
           apiKey: { type: 'string', description: 'API key (ds_xxx). Optional for some endpoints.' },
         },
@@ -93,7 +93,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       inputSchema: {
         type: 'object' as const,
         properties: {
-          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
+          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
           chain: { type: 'string', description: 'Chain name or ID' },
           agentId: { type: 'number', description: 'Agent ID' },
           apiKey: { type: 'string', description: 'API key (optional)' },
