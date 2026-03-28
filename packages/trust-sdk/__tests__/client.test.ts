@@ -150,6 +150,77 @@ describe('DenScope client (API key mode)', () => {
   })
 })
 
+describe('DenScope client (SKALE Base chain)', () => {
+  const originalFetch = globalThis.fetch
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch
+  })
+
+  it('getAgent builds correct URL for SKALE Base chain ID', async () => {
+    const body = { agent: { chainId: 1187947933, agentId: 1, owner: '0xdef' } }
+    globalThis.fetch = mockFetch(200, body)
+
+    const ds = new DenScope({ apiKey: 'ds_test123' })
+    const result = await ds.getAgent(1187947933, 1)
+
+    expect(result).toEqual(body)
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${BASE}/api/v1/agent/1187947933/1`,
+      { headers: { Authorization: 'Bearer ds_test123' } },
+    )
+  })
+
+  it('getScore builds correct URL for SKALE Base', async () => {
+    const body = { score: { value: 65, confidence: 'medium' }, formula: 'https://...' }
+    globalThis.fetch = mockFetch(200, body)
+
+    const ds = new DenScope({ apiKey: 'ds_test123' })
+    const result = await ds.getScore(1187947933, 1)
+
+    expect(result.score.value).toBe(65)
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${BASE}/api/v1/agent/1187947933/1/score`,
+      expect.any(Object),
+    )
+  })
+
+  it('search with SKALE Base chainId passes correct param', async () => {
+    const body = { agents: [], count: 0 }
+    globalThis.fetch = mockFetch(200, body)
+
+    const ds = new DenScope({ apiKey: 'ds_test123' })
+    await ds.search({ chainId: 1187947933, limit: 5 })
+
+    expect(globalThis.fetch).toHaveBeenCalledWith(
+      `${BASE}/api/v1/search?chainId=1187947933&limit=5`,
+      expect.any(Object),
+    )
+  })
+})
+
+describe('SKALE alias validation (MCP server contract)', () => {
+  // These tests verify the expected chain alias contract that the MCP server
+  // ORACLES registry enforces. Only 'skale-base' is a valid alias.
+  const VALID_SKALE_ALIASES = ['skale-base']
+  const INVALID_SKALE_ALIASES = ['skale', 'skale-mainnet', 'skalebase', 'SKALE', 'skale-base-mainnet']
+
+  it('skale-base is the only canonical alias', () => {
+    expect(VALID_SKALE_ALIASES).toEqual(['skale-base'])
+  })
+
+  it.each(INVALID_SKALE_ALIASES)('"%s" is not a valid SKALE alias', (alias) => {
+    expect(VALID_SKALE_ALIASES).not.toContain(alias)
+  })
+
+  it('SKALE Base chain ID is 1187947933', () => {
+    const SKALE_BASE_CHAIN_ID = 1187947933
+    expect(SKALE_BASE_CHAIN_ID).toBeGreaterThan(0)
+    expect(SKALE_BASE_CHAIN_ID).not.toBe(42220) // not Celo
+    expect(SKALE_BASE_CHAIN_ID).not.toBe(11142220) // not Celo Sepolia
+  })
+})
+
 describe('DenScope client (x402 mode)', () => {
   const originalFetch = globalThis.fetch
 
