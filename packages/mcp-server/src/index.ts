@@ -107,7 +107,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       inputSchema: {
         type: 'object' as const,
         properties: {
-          oracle: { type: 'string', description: 'Trust oracle: "denscope" or "ayni"', enum: ['denscope', 'ayni'] },
+          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
           chain: { type: 'string', description: 'Chain name or ID' },
           agentId: { type: 'number', description: 'Agent ID' },
           status: { type: 'string', description: 'Filter by status', enum: ['open', 'resolved', 'all'] },
@@ -122,7 +122,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       inputSchema: {
         type: 'object' as const,
         properties: {
-          oracle: { type: 'string', description: 'Trust oracle: "denscope" or "ayni"', enum: ['denscope', 'ayni'] },
+          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
           chain: { type: 'string', description: 'Chain name or ID (optional filter)' },
           query: { type: 'string', description: 'Search query (agent ID, owner address)' },
           limit: { type: 'number', description: 'Max results (default 10)' },
@@ -137,7 +137,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       inputSchema: {
         type: 'object' as const,
         properties: {
-          oracle: { type: 'string', description: 'Trust oracle: "denscope" or "ayni"', enum: ['denscope', 'ayni'] },
+          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
           chain: { type: 'string', description: 'Chain name or ID' },
           agentId: { type: 'number', description: 'Agent ID' },
           limit: { type: 'number', description: 'Max events (default 10)' },

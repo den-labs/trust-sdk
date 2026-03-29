@@ -85,7 +85,7 @@ Both SDKs expose the same 5 methods:
 ### Constructor
 
 ```typescript
-// DenScope (Celo)
+// DenScope (Celo, SKALE Base)
 const client = new DenScope({ apiKey: 'ds_...' })
 const client = new DenScope({ account, baseUrl: '...' })
 
@@ -140,7 +140,7 @@ After cloning this repository:
 ```bash
 pnpm install && pnpm build
 
-# DenScope (Celo)
+# DenScope (Celo, SKALE Base)
 DENSCOPE_API_KEY=ds_... node packages/trust-sdk/examples/get-score.mjs
 DENSCOPE_API_KEY=ds_... node packages/trust-sdk/examples/test-all-endpoints.mjs
 

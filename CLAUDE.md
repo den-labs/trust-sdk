@@ -36,7 +36,7 @@ pnpm typecheck   # Type-check all packages
 - `src/x402.ts` — Decode 402, sign EIP-712, build X-PAYMENT header
 - `src/constants.ts` — API prefix, EIP-3009 types, signature validity
 
-### trust-sdk (DenScope — Celo)
+### trust-sdk (DenScope — Celo, SKALE Base)
 - `src/client.ts` — `DenScope extends TrustClient` with `baseUrl = denscope.vercel.app`
 - `src/index.ts` — Re-exports `DenScope` + backward-compatible `DenScopeError` alias
 
