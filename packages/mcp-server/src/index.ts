@@ -146,6 +146,22 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
         required: ['oracle', 'chain', 'agentId'],
       },
     },
+    {
+      name: 'trust_evaluate',
+      description: 'Evaluate the trustworthiness of an ERC-8004 agent using a contextual preset. Returns a structured judgment with trust band, risk level, recommended action, and human-readable rationale. Use this when you need to decide whether to interact with, delegate to, or transact with an agent.',
+      inputSchema: {
+        type: 'object' as const,
+        properties: {
+          oracle: { type: 'string', description: 'Trust oracle: "denscope" (Celo, SKALE Base) or "ayni" (Avalanche)', enum: ['denscope', 'ayni'] },
+          chain: { type: 'string', description: 'Chain name or ID (e.g. "celo", "skale-base", 42220)' },
+          agentId: { type: 'number', description: 'Agent ID (numeric)' },
+          preset: { type: 'string', description: 'Evaluation preset: "default_safety" (general), "agent_to_agent" (inter-agent), "defi_counterparty" (financial)', enum: ['default_safety', 'agent_to_agent', 'defi_counterparty'] },
+          context: { type: 'string', description: 'Optional context hint (e.g. "lending pool interaction")' },
+          apiKey: { type: 'string', description: 'API key (ds_xxx). Required.' },
+        },
+        required: ['oracle', 'chain', 'agentId', 'preset'],
+      },
+    },
   ],
 }))
 
@@ -302,6 +318,47 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
               '',
               ...lines,
               pagination.hasMore ? `\n  ... and ${pagination.total - events.length} more` : '',
+            ].filter(Boolean).join('\n'),
+          }],
+        }
+      }
+
+      case 'trust_evaluate': {
+        const chainId = resolveChainId(oracle, args?.chain as string)
+        const agentId = args?.agentId as number
+        const preset = (args?.preset as string) ?? 'default_safety'
+        const context = args?.context as string | undefined
+        const { evaluation } = await client.evaluate(chainId, agentId, {
+          preset: preset as 'default_safety' | 'agent_to_agent' | 'defi_counterparty',
+          context,
+        })
+
+        const actionEmoji = evaluation.recommended_action === 'allow' ? '✅'
+          : evaluation.recommended_action === 'review' ? '⚠️' : '🚫'
+
+        return {
+          content: [{
+            type: 'text',
+            text: [
+              `Trust Evaluation for Agent #${agentId} on ${oracle.name} (chain ${chainId}):`,
+              ``,
+              `  Preset: ${evaluation.preset}`,
+              `  Trust Band: ${evaluation.trust_band}`,
+              `  Status: ${evaluation.status}`,
+              `  Signal Strength: ${evaluation.signal_strength}`,
+              `  Risk Level: ${evaluation.risk_level}`,
+              `  Confidence: ${evaluation.decision_confidence}`,
+              `  ${actionEmoji} Action: ${evaluation.recommended_action}`,
+              ``,
+              `  Rationale: ${evaluation.rationale}`,
+              ``,
+              `  Evidence:`,
+              `    Score: ${evaluation.evidence.score}/100 (${evaluation.evidence.score_confidence} confidence)`,
+              `    Feedback: ${evaluation.evidence.feedbackCount} (${Math.round(evaluation.evidence.positiveRatio * 100)}% positive)`,
+              `    Open Incidents: ${evaluation.evidence.openIncidents}`,
+              `    Last Activity: ${evaluation.evidence.lastActivityDays}d ago`,
+              `    Age: ${evaluation.evidence.ageDays}d`,
+              evaluation.flags.length > 0 ? `\n  Flags: ${evaluation.flags.join(', ')}` : '',
             ].filter(Boolean).join('\n'),
           }],
         }
