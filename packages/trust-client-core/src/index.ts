@@ -25,4 +25,9 @@ export type {
   PaymentRequirement,
   ResourceInfo,
   PaymentRequiredBody,
+  EvaluateOptions,
+  EvaluatePreset,
+  EvaluateResponse,
+  Evaluation,
+  EvaluationEvidence,
 } from './types'

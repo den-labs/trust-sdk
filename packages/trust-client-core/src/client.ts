@@ -12,6 +12,8 @@ import type {
   TrustClientFetch,
   EventsOptions,
   EventsResponse,
+  EvaluateOptions,
+  EvaluateResponse,
   ScoreResponse,
   SearchOptions,
   SearchResponse,
@@ -89,6 +91,22 @@ export class TrustClient {
     return this.request(`/search${qs ? `?${qs}` : ''}`)
   }
 
+  /** Evaluate agent trust with contextual preset (supports x402) */
+  async evaluate(
+    chainId: number,
+    agentId: number,
+    options: EvaluateOptions,
+  ): Promise<EvaluateResponse> {
+    return this.requestPost(`/trust/evaluate`, {
+      chainId,
+      agentId,
+      preset: options.preset,
+      ...(options.context ? { context: options.context } : {}),
+      ...(options.sensitivity ? { sensitivity: options.sensitivity } : {}),
+      ...(options.objective ? { objective: options.objective } : {}),
+    })
+  }
+
   private async request<T>(path: string): Promise<T> {
     const url = `${this.baseUrl}${API_PREFIX}${path}`
     const headers: Record<string, string> = {}
@@ -123,13 +141,59 @@ export class TrustClient {
     return this.handleResponse<T>(response)
   }
 
+  private async requestPost<T>(path: string, body: Record<string, unknown>): Promise<T> {
+    const url = `${this.baseUrl}${API_PREFIX}${path}`
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    }
+
+    if (isApiKeyConfig(this.config)) {
+      headers.Authorization = `Bearer ${this.config.apiKey}`
+    }
+
+    const response = await this.fetchWithConfig(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    })
+
+    // x402 retry for POST
+    if (response.status === 402 && isX402Config(this.config)) {
+      const paymentRequired = decodePaymentRequired(response)
+      if (!paymentRequired.accepts.length) {
+        throw new PaymentRequiredError('No accepted payment methods', paymentRequired)
+      }
+
+      const requirement = paymentRequired.accepts[0]
+      const paymentHeader = await buildPaymentHeader(
+        this.config,
+        requirement,
+        paymentRequired.resource,
+      )
+
+      const retryResponse = await this.fetchWithConfig(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-PAYMENT': paymentHeader },
+        body: JSON.stringify(body),
+      })
+
+      return this.handleResponse<T>(retryResponse)
+    }
+
+    return this.handleResponse<T>(response)
+  }
+
   private async fetchWithConfig(
     url: string,
-    init: { headers: Record<string, string> },
+    init: { method?: string; headers: Record<string, string>; body?: string },
   ): Promise<Response> {
     const { signal, cleanup } = this.createRequestSignal()
     try {
-      const requestInit: RequestInit = { headers: init.headers }
+      const requestInit: RequestInit = {
+        method: init.method ?? 'GET',
+        headers: init.headers,
+      }
+      if (init.body) requestInit.body = init.body
       if (signal) requestInit.signal = signal
       return await this.fetchImpl(url, requestInit)
     } finally {

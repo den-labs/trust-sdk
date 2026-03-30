@@ -149,6 +149,47 @@ export interface SignalsOptions {
   status?: 'open' | 'resolved' | 'all'
 }
 
+// --- Evaluation Types ---
+
+export type EvaluatePreset = 'default_safety' | 'agent_to_agent' | 'defi_counterparty'
+
+export interface EvaluateOptions {
+  preset: EvaluatePreset
+  context?: string
+  sensitivity?: 'low' | 'normal' | 'high'
+  objective?: string
+}
+
+export interface EvaluationEvidence {
+  score: number
+  score_confidence: 'low' | 'medium' | 'high'
+  feedbackCount: number
+  positiveRatio: number
+  openIncidents: number
+  lastActivityDays: number
+  ageDays: number
+}
+
+export interface Evaluation {
+  trust_band: 'high' | 'medium' | 'low' | 'insufficient_signal'
+  status: 'active' | 'stale' | 'dormant' | 'anomalous'
+  signal_strength: 'strong' | 'moderate' | 'weak' | 'none'
+  risk_level: 'minimal' | 'moderate' | 'elevated' | 'critical'
+  decision_confidence: 'low' | 'medium' | 'high'
+  recommended_action: 'allow' | 'review' | 'limit'
+  flags: string[]
+  rationale: string
+  evidence: EvaluationEvidence
+  preset: string
+  evaluatedAt: string
+  chainId: number
+  agentId: number
+}
+
+export interface EvaluateResponse {
+  evaluation: Evaluation
+}
+
 // --- x402 Wire Types ---
 
 export interface PaymentRequirement {

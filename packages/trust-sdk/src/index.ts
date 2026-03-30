@@ -28,4 +28,9 @@ export type {
   EventsOptions,
   SearchOptions,
   SignalsOptions,
+  EvaluateOptions,
+  EvaluatePreset,
+  EvaluateResponse,
+  Evaluation,
+  EvaluationEvidence,
 } from '@denlabs/trust-client-core'

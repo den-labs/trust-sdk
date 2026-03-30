@@ -34,7 +34,7 @@ describe('TrustClient (API key mode)', () => {
     expect(result).toEqual(body)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       `${BASE}/api/v1/agent/42220/5`,
-      { headers: { Authorization: 'Bearer test_key' } },
+      { method: 'GET', headers: { Authorization: 'Bearer test_key' } },
     )
   })
 
