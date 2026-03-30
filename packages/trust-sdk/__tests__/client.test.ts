@@ -30,7 +30,7 @@ describe('DenScope client (API key mode)', () => {
     expect(result).toEqual(body)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       `${BASE}/api/v1/agent/42220/5`,
-      { headers: { Authorization: 'Bearer ds_test123' } },
+      { method: 'GET', headers: { Authorization: 'Bearer ds_test123' } },
     )
   })
 
@@ -167,7 +167,7 @@ describe('DenScope client (SKALE Base chain)', () => {
     expect(result).toEqual(body)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       `${BASE}/api/v1/agent/1187947933/1`,
-      { headers: { Authorization: 'Bearer ds_test123' } },
+      { method: 'GET', headers: { Authorization: 'Bearer ds_test123' } },
     )
   })
 

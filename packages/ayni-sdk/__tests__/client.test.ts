@@ -30,7 +30,7 @@ describe('Ayni client (API key mode)', () => {
     expect(result).toEqual(body)
     expect(globalThis.fetch).toHaveBeenCalledWith(
       `${BASE}/api/v1/agent/43114/1`,
-      { headers: { Authorization: 'Bearer ay_test123' } },
+      { method: 'GET', headers: { Authorization: 'Bearer ay_test123' } },
     )
   })
 
