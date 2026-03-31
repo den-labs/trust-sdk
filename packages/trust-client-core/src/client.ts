@@ -19,6 +19,8 @@ import type {
   SearchResponse,
   SignalsOptions,
   SignalsResponse,
+  TrustHistoryOptions,
+  TrustHistoryResponse,
   X402Config,
 } from './types'
 
@@ -89,6 +91,28 @@ export class TrustClient {
     if (options?.limit != null) params.set('limit', String(options.limit))
     const qs = params.toString()
     return this.request(`/search${qs ? `?${qs}` : ''}`)
+  }
+
+  /**
+   * Get windowed trust score history for an agent.
+   *
+   * Returns a sequence of time-windowed snapshots ordered from oldest to most
+   * recent. Unlike the point-in-time `getScore()`, this method surfaces recent
+   * degradation that lifetime-aggregate scores would otherwise mask — e.g. an
+   * agent whose last 30-day window is 20 points below their all-time score.
+   *
+   * Supports x402 payment.
+   */
+  async getTrustHistory(
+    chainId: number,
+    agentId: number,
+    options?: TrustHistoryOptions,
+  ): Promise<TrustHistoryResponse> {
+    const params = new URLSearchParams()
+    if (options?.window) params.set('window', options.window)
+    if (options?.limit != null) params.set('limit', String(options.limit))
+    const qs = params.toString()
+    return this.request(`/agent/${chainId}/${agentId}/history${qs ? `?${qs}` : ''}`)
   }
 
   /** Evaluate agent trust with contextual preset (supports x402) */
