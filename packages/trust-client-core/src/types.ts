@@ -149,6 +149,46 @@ export interface SignalsOptions {
   status?: 'open' | 'resolved' | 'all'
 }
 
+// --- Trust History Types ---
+
+export type TrustHistoryWindow = '7d' | '30d' | '90d' | '365d'
+
+export interface TrustHistoryOptions {
+  /** Time window for each slice. Default: '30d' */
+  window?: TrustHistoryWindow
+  /** Number of slices to return. Default: 6 */
+  limit?: number
+}
+
+/**
+ * A single time-windowed trust snapshot.
+ *
+ * Captures the trust signal within a discrete period, enabling detection of
+ * recent degradation that lifetime-aggregate scores would otherwise mask.
+ */
+export interface TrustScorePoint {
+  /** ISO-8601 start of the window */
+  periodStart: string
+  /** ISO-8601 end of the window */
+  periodEnd: string
+  /** Trust score for this window (0–100), or null when no signal exists */
+  score: number | null
+  confidence: 'low' | 'medium' | 'high' | 'none'
+  /** Count of feedback events within the window */
+  feedbackCount: number
+  /** Fraction of positive feedback within the window */
+  positiveRatio: number | null
+  /** Count of open incidents overlapping the window */
+  openIncidents: number
+}
+
+export interface TrustHistoryResponse {
+  chainId: number
+  agentId: number
+  window: TrustHistoryWindow
+  history: TrustScorePoint[]
+}
+
 // --- Evaluation Types ---
 
 export type EvaluatePreset = 'default_safety' | 'agent_to_agent' | 'defi_counterparty'
