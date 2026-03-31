@@ -50,6 +50,23 @@ const { score } = await ayni.getScore(43114, 1)
 console.log(score.value, score.confidence)
 ```
 
+### Trust Evaluation
+
+Run contextual trust evaluations with configurable presets:
+
+```typescript
+import { DenScope } from '@denlabs/trust-sdk'
+
+const ds = new DenScope({ apiKey: 'ds_...' })
+const { evaluation } = await ds.evaluate(42220, 5, { preset: 'default_safety' })
+
+console.log(evaluation.recommended_action) // "allow" | "review" | "limit"
+console.log(evaluation.trust_band)         // "high" | "medium" | "low" | "insufficient_signal"
+console.log(evaluation.rationale)          // Human-readable explanation
+```
+
+Available presets: `default_safety`, `agent_to_agent`, `defi_counterparty`.
+
 ### x402 Payment Mode
 
 Agents with wallets can pay per-query instead of using API keys:
@@ -80,7 +97,7 @@ x402 is supported on `/score` and `/signals` endpoints. The SDK handles the full
 
 ## API Reference
 
-Both SDKs expose the same 5 methods:
+Both SDKs expose the same 6 methods:
 
 ### Constructor
 
@@ -111,6 +128,7 @@ const client = new Ayni({ account, baseUrl: '...' })
 | `getSignals(chainId, agentId, opts?)` | Risk signals/incidents | Yes |
 | `getEvents(chainId, agentId, opts?)` | On-chain event history | No |
 | `search(opts?)` | Search agents by ID, owner, or chain | No |
+| `evaluate(chainId, agentId, opts)` | Contextual trust evaluation with presets | Yes |
 
 ### Error Types
 
