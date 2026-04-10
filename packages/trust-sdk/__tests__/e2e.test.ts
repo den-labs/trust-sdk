@@ -18,8 +18,11 @@ describe.skipIf(!apiKey)('DenScope E2E (live endpoints)', () => {
     expect(agent).toBeDefined()
     expect(agent.chainId).toBe(chainId)
     expect(agent.agentId).toBe(agentId)
-    expect(typeof agent.owner).toBe('string')
-    expect(agent.owner).toMatch(/^0x[0-9a-fA-F]+$/)
+    // owner may be null if agent was registered before poller was active
+    if (agent.owner !== null) {
+      expect(typeof agent.owner).toBe('string')
+      expect(agent.owner).toMatch(/^0x[0-9a-fA-F]+$/)
+    }
     expect(typeof agent.feedbackCount).toBe('number')
     expect(typeof agent.positiveCount).toBe('number')
     expect(typeof agent.negativeCount).toBe('number')
@@ -80,7 +83,10 @@ describe.skipIf(!apiKey)('DenScope E2E (live endpoints)', () => {
     agents.forEach((a) => {
       expect(a.chainId).toBe(chainId)
       expect(typeof a.agentId).toBe('number')
-      expect(typeof a.owner).toBe('string')
+      // owner may be null for agents registered before poller
+      if (a.owner !== null) {
+        expect(typeof a.owner).toBe('string')
+      }
     })
   })
 
@@ -118,7 +124,9 @@ describe.skipIf(!apiKey)('DenScope E2E (live endpoints)', () => {
 
   it('score consistency — value matches stats', async () => {
     const { score } = await client.getScore(chainId, agentId)
-    expect(score.stats.feedbackCount).toBe(
+    // feedbackCount >= positive + negative because neutral feedbacks (value=0)
+    // increment total but neither positive nor negative
+    expect(score.stats.feedbackCount).toBeGreaterThanOrEqual(
       score.stats.positiveCount + score.stats.negativeCount,
     )
   })
