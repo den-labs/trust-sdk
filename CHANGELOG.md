@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-04-22
+
+### Fixed
+
+- `@denlabs/trust-client-core` was stuck at 0.1.0 even though `evaluate()` had
+  been added to `TrustClient` since 2026-03-29. Consumers that pulled from npm
+  (e.g. `denscope-agent` after switching off workspace `file:` links) saw a
+  type error `Property 'evaluate' does not exist on type 'DenScope'` at build
+  time and a runtime miss when actually invoked.
+
+### Changed
+
+- `@denlabs/trust-client-core`: 0.1.0 → 0.2.0 (minor — adds public
+  `evaluate()` method on `TrustClient`).
+- `@denlabs/trust-sdk`: 0.2.1 → 0.2.2 (re-publish to pick up the new
+  `trust-client-core` and re-emit type declarations including inherited
+  `evaluate()`).
+- `@denlabs/ayni-sdk`: 0.1.2 → 0.1.3 (same reason as trust-sdk).
+
 ## [0.2.2] - 2026-04-21
 
 ### Fixed

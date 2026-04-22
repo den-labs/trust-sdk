@@ -1,6 +1,6 @@
 {
   "name": "@denlabs/trust-client-core",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Shared core for DenLabs trust oracle SDKs — base client, x402 payment flow, error handling, and shared types",
   "type": "module",
   "main": "./dist/index.cjs",
