@@ -30,4 +30,8 @@ export type {
   EvaluateResponse,
   Evaluation,
   EvaluationEvidence,
+  TrustHistoryWindow,
+  TrustHistoryOptions,
+  TrustScorePoint,
+  TrustHistoryResponse,
 } from './types'
